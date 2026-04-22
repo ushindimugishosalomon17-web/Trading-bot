@@ -3,7 +3,7 @@
 
 """
 BOT DE TRADING SNIPER HAUTE CONFIANCE
-Version sans Telegram - Exécution automatique uniquement
+Version sans Telegram - Execution automatique uniquement
 """
 
 import MetaTrader5 as mt5
@@ -69,14 +69,14 @@ def connect_mt5():
     return True
 
 # ============================================
-# VÉRIFICATION POSITION
+# VERIFICATION POSITION
 # ============================================
 def get_current_position(symbol):
     pos = mt5.positions_get(symbol=symbol)
     return pos[0] if pos else None
 
 # ============================================
-# EXÉCUTION ORDRE
+# EXECUTION ORDRE
 # ============================================
 def execute_order(signal_type, last_close):
     point = mt5.symbol_info(SYMBOL).point
@@ -106,22 +106,22 @@ def execute_order(signal_type, last_close):
 
     result = mt5.order_send(request)
     if result.retcode == mt5.TRADE_RETCODE_DONE:
-        print(f"✅ Ordre {signal_type} exécuté. SL={sl:.5f}, TP={tp:.5f}")
+        print(f"SUCCES Ordre {signal_type} execute. SL={sl:.5f}, TP={tp:.5f}")
     else:
-        print(f"❌ Échec {signal_type}: {result.comment}")
+        print(f"ECHEC {signal_type}: {result.comment}")
 
 # ============================================
 # BOUCLE PRINCIPALE
 # ============================================
 def main():
-    print("🤖 Bot Sniper - Exécution unique")
+    print("Bot Sniper - Execution unique")
     if not connect_mt5():
-        print("❌ Échec connexion MT5")
+        print("ECHEC connexion MT5")
         return
 
     rates = mt5.copy_rates_from_pos(SYMBOL, TIMEFRAME, 0, 200)
     if rates is None or len(rates) < 100:
-        print("❌ Pas assez de données")
+        print("Pas assez de donnees")
         mt5.shutdown()
         return
 
@@ -152,10 +152,11 @@ def main():
 
     if (buy_signal or sell_signal) and position is None:
         signal_type = "ACHAT" if buy_signal else "VENTE"
-        print(f"🎯 SIGNAL {signal_type} détecté à {last_close:.5f}")
+        print(f"SIGNAL {signal_type} detecte a {last_close:.5f}")
         execute_order(signal_type, last_close)
     else:
-        print(f"Pas de signal. Close={last_close:.5f} ST={'📈' if last_st==1 else '📉'} RSI={last_rsi:.1f}")
+        trend_str = "UP" if last_st == 1 else "DOWN"
+        print(f"Pas de signal. Close={last_close:.5f} ST={trend_str} RSI={last_rsi:.1f}")
 
     mt5.shutdown()
 
